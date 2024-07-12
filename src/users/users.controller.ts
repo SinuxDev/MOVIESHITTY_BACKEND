@@ -2,8 +2,6 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Get,
-  InternalServerErrorException,
   Post,
   Res,
   UsePipes,
@@ -17,11 +15,6 @@ import { Response } from 'express';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
 
   @Post('register')
   @UsePipes(
