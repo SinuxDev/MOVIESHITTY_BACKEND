@@ -1,21 +1,16 @@
 import {
   BadRequestException,
-  Body,
   Injectable,
   InternalServerErrorException,
-  ValidationPipe,
 } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { createUserDTO } from './dto/createUserDTO';
 import { ResponseFormat } from 'src/utils/response.util';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly databaseService: DatabaseService) {}
-
-  async findAll() {
-    return await this.databaseService.user.findMany();
-  }
 
   async register(createUser: createUserDTO) {
     try {
@@ -29,8 +24,13 @@ export class UsersService {
         throw new BadRequestException('Users already exists');
       }
 
+      const hashedPassword = await bcrypt.hash(createUser.password, 10);
+
       const user = await this.databaseService.user.create({
-        data: createUser,
+        data: {
+          ...createUser,
+          password: hashedPassword,
+        },
       });
 
       return ResponseFormat(user, true, 201);
